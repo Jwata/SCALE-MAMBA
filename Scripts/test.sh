@@ -9,6 +9,11 @@ ROOT=$HERE/..
 # whenever we invoke python scripts.
 export PYTHONPATH=$ROOT:$PYTHONPATH
 
+docker_pre=$1
+docker_container=$2
+docker_volumes=$3
+shift 3
+
 while getopts sCm:c:n opt; do
     case $opt in
 	s) test_opts="-s"; compile_opts="$compile_opts -s" ;;
@@ -25,9 +30,9 @@ run_test() {
     test=$1
     shift
     printf "\n\n\n\n\n\n\n\n\n\n"
-    echo "$test"
-    $ROOT/compile.py --dead-code-elimination $compile_opts $* Programs/$test || exit 1
-    Scripts/run-online.sh Programs/$test || exit 1
+    >&2 echo "$test"
+    docker run -a STDOUT -a STDERR --rm $docker_volumes $docker_container ./compile.py --dead-code-elimination $compile_opts $* Programs/$test || exit 1
+    Scripts/run-online.sh $docker_pre $docker_container "$docker_volumes$" Programs/$test || exit 1
     python Scripts/test-result.py $test_opts $test || exit 1
 }
 
