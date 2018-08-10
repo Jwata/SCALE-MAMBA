@@ -13,15 +13,15 @@ for i in $(seq 1 24); do
   ./Scripts/test.sh $docker_pre $docker_container "$docker_volumes" $test || exit 1
 done
 
-#for i in $(seq 20 21); do
-#  cp -R Auto-Test-Data/$i/* Data/
-#  echo Running testscript on set $i
-#  ./Scripts/test_32.sh || exit 1
-#done
+for i in $(seq 20 21); do
+  docker run --rm $docker_volumes $docker_container cp -R Auto-Test-Data/$i/* Data/
+  >&2 echo Running testscript on set $i
+  ./Scripts/test_32.sh $docker_pre $docker_container "$docker_volumes" $test || exit 1
+done
 
-#for i in $(seq 22 24); do
-#  cp -R Auto-Test-Data/$i/* Data/
-#  echo Running testscript on set $i
-#  ./Scripts/test.sh || exit 1
-#done
+for i in $(seq 22 24); do
+  docker run --rm $docker_volumes $docker_container cp -R Auto-Test-Data/$i/* Data/
+  >&2 echo Running testscript on set $i
+  ./Scripts/test.sh $docker_pre $docker_container "$docker_volumes" $test || exit 1
+done
 
