@@ -31,6 +31,7 @@ run_test() {
     shift
     printf "\n\n\n\n\n\n\n\n\n\n"
     >&2 echo "$test"
+    >&2 echo "compiling"
     docker run -a STDOUT -a STDERR --rm $docker_volumes $docker_container ./compile.py --dead-code-elimination $compile_opts $* Programs/$test || exit 1
     Scripts/run-online.sh $docker_pre $docker_container "$docker_volumes$" Programs/$test || exit 1
     python Scripts/test-result.py $test_opts $test || exit 1
