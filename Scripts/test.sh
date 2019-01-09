@@ -24,9 +24,7 @@ shift $[OPTIND-1]
 run_test() {
     test=$1
     shift
-    # printf "\n\n\n\n\n\n\n\n\n\n"
     echo "$test"
-    # cp Auto-Test-Data/${MPC_SETTING}/* Data/
     docker run -a STDOUT -a STDERR --rm $(echo $DOCKER_VOLS) ${CONTAINER} \
       /scale-mamba/compile.py --dead-code-elimination $compile_opts $* Programs/$test || exit 1
     Scripts/run-online.sh Programs/$test || exit 1
