@@ -1,3 +1,4 @@
+volumes=$(echo $DOCKER_VOLS)
 
 run_player() {
     bin=$1
@@ -5,21 +6,45 @@ run_player() {
     if ! test -e Scripts/logs; then
         mkdir Scripts/logs
     fi
-    params="$*"
+    params="-f 1 -v 1 $*"
     rem=$(($players - 2))
+    last_player=$(($players - 1))
+
+    trap 'echo interrupting players' SIGINT
+
+    # run players
+    for i in $(seq 0 $last_player); do
+      echo "starting up player $i"
+      docker run --rm -d $volumes --network $DOCKER_NET --ip 172.29.0.10$(($i+1)) --name ${DOCKER_PRE}-player-$i $CONTAINER tail -f /dev/null
+    done
+
+    # run program on each container
     for i in $(seq 0 $rem); do
       echo "trying with player $i"
       >&2 echo Running ../$bin $i $params
-      ./$bin $i $params 2>&1 | tee Scripts/logs/$i  &
+       docker exec ${DOCKER_PRE}-player-$i $bin $i $params 2>&1 >Scripts/logs/$i &
     done
-    last_player=$(($players - 1))
+    echo "trying with player $last_player"
     >&2 echo Running ../$bin $last_player $params
-    ./$bin $last_player $params > Scripts/logs/$last_player 2>&1 || return 1
+    docker exec ${DOCKER_PRE}-player-$last_player ./$bin $last_player $params 2>&1 >Scripts/logs/$last_player
+    result=$?
+
+    # extract memory data
+    for i in $(seq 0 $last_player); do
+      docker cp ${DOCKER_PRE}-player-$i:/scale-mamba/Data/Memory-P$i Data/Memory-P$i
+    done
+    docker cp ${DOCKER_PRE}-player-0:/scale-mamba/Data/SharingData.txt Data/
+
+    # stop players
+    for i in $(seq 0 $last_player); do
+      docker stop -t 0 ${DOCKER_PRE}-player-$i > /dev/null
+    done
+
+    trap SIGINT
+
+    return $result
 }
 
-killall Player.x 
-sleep 0.5
-
-declare -i players=$(sed -n 2p Data/NetworkData.txt)
+declare -i players=$(docker run --rm -a STDOUT $volumes $CONTAINER cat Data/NetworkData.txt | sed -n 2p)
 
 #. Scripts/setup.sh

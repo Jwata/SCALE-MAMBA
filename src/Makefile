@@ -3,11 +3,12 @@ include ../CONFIG.mine
 
 CC = g++
 
-CFLAGS = -Wall -std=c++11 -pedantic -Wextra -g -pthread -I$(ROOT)/src -maes -mpclmul -msse4.1 -march=core2 $(FLAGS) $(OPT) -I$(OSSL)/include 
-CPPFLAGS = $(CFLAGS) 
+CFLAGS = -Wall -std=c++11 -pedantic -Wextra -g -pthread -I$(ROOT)/src -maes -mpclmul -msse4.1 -march=core2 $(FLAGS) $(OPT) -I$(OSSL)/include -fPIC
+CPPFLAGS = $(CFLAGS)
 LDLIBS = -L/$(OSSL)/lib -lm -lssl -lcrypto -lmpirxx -lmpir $(LDFLAGS)
+RPATHFLAGS = -Wl,-R,./
 
-all: $(LIB) Setup.x Player.x 
+all: $(LIB) Setup.x Player.x
 
 OFFLINE = $(patsubst %.cpp,%.o,$(wildcard Offline/*.cpp))
 ONLINE = $(patsubst %.cpp,%.o,$(wildcard Online/*.cpp))
@@ -19,7 +20,7 @@ PROCESSOR = $(patsubst %.cpp,%.o,$(wildcard Processor/*.cpp))
 IO = $(patsubst %.cpp,%.o,$(wildcard Input_Output/*.cpp))
 FHE = $(patsubst %.cpp,%.o,$(wildcard FHE/*.cpp))
 
-LIB = libMPC.a
+LIB = libMPC.so
 
 OBJ = Setup.o Player.o 
 
@@ -32,15 +33,16 @@ $(OBJ): $(SRC)
 	$(CC) $(CFLAGS) -c $*.cpp
 
 $(LIB): $(SYSTEM) $(MATH) $(TOOLS) $(LSSS) $(OFFLINE) $(ONLINE) $(PROCESSOR) $(IO) $(FHE)
-	$(AR) -crs libMPC.a $^
+	$(CC) -shared $(CFLAGS) $^ -o $(LIB)
+	- cp $(LIB) ../
 
 Setup.x: $(OBJ) $(LIB)
-	$(CC) $(CFLAGS) -o Setup.x Setup.o $(LIB) $(LDLIBS)
-	- mv Setup.x ../
+	$(CC) $(CFLAGS) -o Setup.x Setup.o $(LIB) $(LDLIBS) $(RPATHFLAGS)
+	- cp Setup.x ../
 
 Player.x: $(OBJ) $(LIB)
-	$(CC) $(CFLAGS) -o Player.x Player.o $(LIB) $(LDLIBS)
-	- mv Player.x ../
+	$(CC) $(CFLAGS) -o Player.x Player.o $(LIB) $(LDLIBS) $(RPATHFLAGS)
+	- cp Player.x ../
 
 clean:
 	- rm *.x *.o libMPC.a
