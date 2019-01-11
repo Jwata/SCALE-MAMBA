@@ -27,20 +27,20 @@ clear_a = a.reveal()
 
 # arrays and loops
 
-a = Array(100, sint)
-
-@for_range(100)
-def f(i):
-    a[i] = sint(i)**2
-
-test(a[99], 99**2)
-
-# conditional
-
-if_then(cint(0))
-a[0] = 123
-else_then()
-a[0] = 789
-end_if()
-
-test(a[0], 789)
+# a = Array(100, sint)
+# 
+# @for_range(100)
+# def f(i):
+#     a[i] = sint(i)**2
+# 
+# test(a[99], 99**2)
+# 
+# # conditional
+# 
+# if_then(cint(0))
+# a[0] = 123
+# else_then()
+# a[0] = 789
+# end_if()
+# 
+# test(a[0], 789)

@@ -8,13 +8,15 @@ run_player() {
     if ! test -e Scripts/logs; then
         mkdir Scripts/logs
     fi
-    params="$*"
+    params="-f 1 -v 5 $*"
     rem=$(($players - 2))
     last_player=$(($players - 1))
 
     for i in $(seq 0 $last_player); do
       echo "starting up container $i"
-      docker run --rm -d $docker_volumes --network $docker_pre-testnet --ip 172.29.0.10$(($i+1)) --name $docker_pre-player-$i $docker_container tail -f /dev/null
+      run_player_cmd="docker run --rm -d $docker_volumes --network $docker_pre-testnet --ip 172.29.0.10$(($i+1)) --name $docker_pre-player-$i $docker_container tail -f /dev/null"
+      echo $run_player_cmd
+      eval $run_player_cmd
     done
     for i in $(seq 0 $rem); do
       echo "trying with player $i"
@@ -35,4 +37,4 @@ run_player() {
     return $result
 }
 
-declare -i players=$(docker run --rm -a STDOUT $docker_volumes $docker_container cat Data/NetworkData.txt | sed -n 2p)
+declare -i players=2
