@@ -38,9 +38,9 @@ test(a[99], 99**2)
 # conditional
 
 if_then(cint(0))
-a[0] = 123
+a[0] = cint(123)
 else_then()
-a[0] = 789
+a[0] = cint(789)
 end_if()
 
 test(a[0], 789)

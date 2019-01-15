@@ -6,7 +6,7 @@ run_player() {
     if ! test -e Scripts/logs; then
         mkdir Scripts/logs
     fi
-    params="-f 1 -v 1 $*"
+    params="-f 1 -v 5 $*"
     rem=$(($players - 2))
     last_player=$(($players - 1))
 
