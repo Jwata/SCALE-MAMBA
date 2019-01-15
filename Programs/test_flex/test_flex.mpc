@@ -1,9 +1,28 @@
-a = load_int_to_secret_vector(range(100))
-b = load_int_to_secret_vector(range(100,200))
-c = a * b
-test(c[1])
-test(c[99])
-d = Array(100,'s')
-d.assign(c)
-test(d[0])
-test(d[42])
+def h_product(cond):
+    cint(cond).print_reg()
+
+    a = load_int_to_secret_vector(range(100))
+    b = load_int_to_secret_vector(range(100, 200)) 
+    c = a * b
+    # print_reg(reveal(c))
+    # a = reveal(c)
+
+    # store_in_mem(c, cond-1)
+
+    cond -= 1
+    return cond
+
+def main():
+    itr = 100
+    do_loop(itr, h_product)
+
+open_channel(0)
+a = sint.get_private_input_from(0,0)
+b = a * a
+print_ln("b is: %s", b.reveal())
+close_channel(0)
+print_ln("+++++++++++++++")
+
+start_timer(1)
+main()
+stop_timer(1)

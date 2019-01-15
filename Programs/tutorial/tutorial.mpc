@@ -5,42 +5,58 @@ def test(actual, expected):
     actual = actual.reveal()
     print_ln('expected %s, got %s', expected, actual)
 
-# cint: clear integers modulo p
-# sint: secret integers modulo p
 
-a = sint(1)
-b = cint(2)
+def tutorial(cnd):
+    # cint: clear integers modulo p
+    # sint: secret integers modulo p
+    
+    a = sint(1)
+    b = sint(2)
+    
+    test(a + b, 3)
+    test(a + a, 2)
+    test(a * b, 2)
+    test(a * a, 1)
+    test(a - b, -1)
+    test(a < b, 1)
+    test(a <= b, 1)
+    test(a >= b, 0)
+    test(a > b, 0)
+    test(a == b, 0)
+    test(a != b, 1)
+    
+    clear_a = a.reveal()
+    
+    # arrays and loops
+    
+    a = Array(100, sint)
+    
+    @for_range(100)
+    def f(i):
+        a[i] = sint(i)**2
+    
+    test(a[99], 99**2)
+    
+    # conditional
+    
+    if_then(cint(0))
+    a[0] = sint(123)
+    else_then()
+    a[0] = sint(789)
+    end_if()
+    
+    test(a[0], 789)
 
-test(a + b, 3)
-test(a + a, 2)
-test(a * b, 2)
-test(a * a, 1)
-test(a - b, -1)
-test(a < b, 1)
-test(a <= b, 1)
-test(a >= b, 0)
-test(a > b, 0)
-test(a == b, 0)
-test(a != b, 1)
+    cnd -= 1
+    return cnd
 
-clear_a = a.reveal()
+open_channel(0)
+a = sint.get_private_input_from(0,0)
+b = a * a
+print_ln("b is: %s", b.reveal())
+close_channel(0)
+print_ln("+++++++++++++++")
 
-# arrays and loops
-
-a = Array(100, sint)
-
-@for_range(100)
-def f(i):
-    a[i] = sint(i)**2
-
-test(a[99], 99**2)
-
-# conditional
-
-if_then(cint(0))
-a[0] = cint(123)
-else_then()
-a[0] = cint(789)
-end_if()
-
-test(a[0], 789)
+start_timer(0)
+do_loop(100, tutorial)
+stop_timer(0)
