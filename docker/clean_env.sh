@@ -10,6 +10,6 @@ stop_players() {
 }
 
 stop_players
-docker container rm ${DOCKER_DUMMY}
-docker volume rm ${VOL_CERTS} ${VOL_PROGS} ${VOL_DATA} ${VOL_TESTDATA}
-docker network rm ${DOCKER_NET}
+docker container rm ${DOCKER_DUMMY} || true
+docker volume rm ${VOL_CERTS} ${VOL_PROGS} ${VOL_DATA} ${VOL_TESTDATA} || true
+docker network rm ${DOCKER_NET} || true
