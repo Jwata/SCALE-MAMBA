@@ -1,25 +1,28 @@
-from random import random
+import time
+import random
 
-sfloat.vlen = 15   # Length of mantissa in bits
-sfloat.plen = 10   # Length of exponent in bits
-sfloat.kappa = 4   # Statistical security parameter for floats
+# value_type = sfloat
+# sfloat.vlen = 15   # Length of mantissa in bits
+# sfloat.plen = 10   # Length of exponent in bits
+# sfloat.kappa = 4   # Statistical security parameter for floats
 
-vector_length = 3
-value_type = sfloat
+value_type = sfix
+
+vector_length = 100
 
 def inner_product(x, y, l):
     # TODO: make sure that both vectors are same Length
 
-    z = sfloat.Array(l)
+    z = value_type.Array(l)
 
     # TODO: vectorize arrays
     for i in range(l):
         z[i] = x[i] * y[i]
 
-    p = sfloat(0)
+    p = value_type(0)
 
-    for i in range(l):
-        p += z[i]
+    for j in range(l):
+        p += z[j]
 
     return p
 
@@ -27,21 +30,15 @@ def get_random_vector(vector_length):
     v = value_type.Array(vector_length)
 
     for i in range(vector_length):
-        v[i] = value_type(random())
+        # NOTE: it seems random variables are generated at compilation and reused in loop
+        v[i] = value_type(random.randint(0, 10**10))
+        print_ln("%s", v[i].reveal())
 
     return v
 
 def test_prog():
     x = get_random_vector(vector_length)
     y = get_random_vector(vector_length)
-    # x = value_type.Array(vector_length)
-    # x[0] = sfloat(0.1)
-    # x[1] = sfloat(0.2)
-    # x[2] = sfloat(0.3)
-    # y = value_type.Array(vector_length)
-    # y[0] = sfloat(0.1)
-    # y[1] = sfloat(0.2)
-    # y[2] = sfloat(0.3)
 
     p = inner_product(x, y, vector_length)
 
@@ -57,10 +54,12 @@ def iter_test(cnd):
 
 def main():
     start_timer(1)
-    do_loop(100, iter_test)
+    do_loop(10, iter_test)
     stop_timer(1)
 
 def preprocess():
+    random.seed(time.time())
+
     open_channel(0)
     a = sint.get_private_input_from(0,0)
     b = a * a

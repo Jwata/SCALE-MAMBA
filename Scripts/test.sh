@@ -27,7 +27,7 @@ run_test() {
     echo "$test"
     docker cp Programs/$test ${DOCKER_DUMMY}:/scale-mamba/Programs
     docker run -a STDOUT -a STDERR --rm $(echo $DOCKER_VOLS) ${CONTAINER} \
-      /scale-mamba/compile.py --dead-code-elimination --debug $compile_opts $* Programs/$test || exit 1
+      /scale-mamba/compile.py --dead-code-elimination $compile_opts $* Programs/$test || exit 1
     Scripts/run-online.sh Programs/$test || exit 1
     # python Scripts/test-result.py $test_opts $test || exit 1
 }
