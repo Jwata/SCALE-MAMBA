@@ -1,0 +1,104 @@
+import time
+import random
+
+value_type = sfix
+
+def load_x():
+    raw_x = [6.575, 6.421, 6.998, 7.147, 6.012, 6.377, 6.009, 5.889, 5.949, 6.096]
+    x = value_type.Array(len(raw_x))
+
+    for i, v in enumerate(raw_x):
+        x[i] = value_type(v)
+
+    return x
+
+def load_y():
+    raw_y = [24, 21.6, 33.4, 36.2, 22.9, 15, 18.9, 21.7, 20.4, 18.2]
+
+    y = value_type.Array(len(raw_y))
+
+    for i, v in enumerate(raw_y):
+        y[i] = value_type(v)
+
+    return y
+
+def load_dataset():
+    return load_x(), load_y()
+
+def print_secret(v, var_name=None):
+    if var_name:
+        print_str("%s = ", var_name)
+    print_ln("%s", v.reveal())
+
+
+def mean(v, n):
+    s = value_type(0)
+    for i in range(n):
+        s += v[i]
+    return s / n
+
+def covariance(x, y, mean_x, mean_y, n):
+    _sum_xy = value_type(0)
+    for i in range(n):
+        _sum_xy += x[i] * y[i]
+    return _sum_xy / n - mean_x * mean_y
+
+def variance(v, mean_v, n):
+    _sum = value_type(0)
+    for i in range(n):
+        _sum += (v[i] - mean_v) ** 2
+    return _sum / n
+
+def train_linear_regression(x, y, n_data):
+    mean_x = mean(x, n_data)
+    print_secret(mean_x, "mean_x")
+
+    mean_y = mean(y, n_data)
+    print_secret(mean_y, "mean_y")
+
+    cov_xy = covariance(x, y, mean_x, mean_y, n_data)
+    print_secret(cov_xy, "covariance_xy")
+
+    var_x = variance(x, mean_x, n_data)
+    print_secret(var_x, "variance_x")
+
+    w1 = cov_xy / var_x
+    w0 = mean_y - w1 * mean_x
+
+    return w0, w1
+
+def test_prog():
+    print_ln("loading data")
+    start_timer(2)
+    x, y = load_dataset()
+    n_data = len(x)
+    print_ln("num_data = %s" % n_data)
+    stop_timer(2)
+
+    print_ln("Start calculating parmas")
+    start_timer(3)
+    w0, w1 = train_linear_regression(x, y, n_data)
+    stop_timer(3)
+
+    print_secret(w0, "w0")
+    print_secret(w1, "w1")
+    print_str("\n")
+
+
+def main():
+    start_timer(1)
+    test_prog()
+    stop_timer(1)
+
+def preprocess():
+    random.seed(time.time())
+
+    open_channel(0)
+    a = sint.get_private_input_from(0,0)
+    b = a * a
+    print_ln("b is: %s", b.reveal())
+    close_channel(0)
+    print_ln("+++++++++++++++")
+
+preprocess()
+main()

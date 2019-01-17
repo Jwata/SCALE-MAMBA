@@ -164,6 +164,12 @@ def test_mem(value, address, lower=None, upper=None):
     print address, mem_value
     test_value(value, mem_value, lineno, 0, lower, upper)
 
+def open_channel(n):
+    pass
+
+def close_channel(n):
+    pass
+
 test1 = test
 
 sys.path.insert(0, 'Test')
